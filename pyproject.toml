@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "solr-grid-tuning"
+version = "0.1"
+description = "Grid search for Solr parameter optimization"
+authors = []
+packages = [ {include = "solr_grid_tuning",  from = "src"} ]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+requests = "^2.25.1"
+
+[tool.poetry.dev-dependencies]
+flake8 = "^3.9.2"
+pytest = "^6.2.4"
+testcontainers = "^3.4.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
