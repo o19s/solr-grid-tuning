@@ -1,8 +1,7 @@
-import csv
-from typing import List
+from typing import List, Tuple
 
-from solr.product_query import ProductQuery
-from solr.solr_client import SolrClient
+from solr_grid_tuning.solr_client import SolrClient
+from solr_grid_tuning.solr_query import SolrQuery
 
 
 class QueryRunner:
