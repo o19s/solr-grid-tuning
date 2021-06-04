@@ -1,3 +1,4 @@
+import dataclasses
 from typing import List, Tuple
 
 from solr_grid_tuning.solr_client import SolrClient
@@ -15,7 +16,6 @@ class QueryRunner:
             result = self.run_query(client, query, return_field)
             results.append((search, result))
         return results
-
 
     def run_queries(self, client: SolrClient, queries: List[SolrQuery], return_field="id") -> List[Tuple[str, List[str]]]:
         """Runs queries with the given parameter and returns a list of return_field values.
