@@ -1,6 +1,6 @@
 import requests
 
-from typing import Tuple
+from typing import Tuple, Optional
 from urllib.parse import urlencode, quote
 
 from solr_grid_tuning.solr_query import SolrQuery
@@ -8,7 +8,7 @@ from solr_grid_tuning.solr_query import SolrQuery
 
 class SolrClient:
 
-    def __init__(self, base_url: str, auth: Tuple[str, str], collection: str, request_handler):
+    def __init__(self, base_url: str, auth: Optional[Tuple[str, str]], collection: str, request_handler):
         self.base_url = base_url
         self.auth = auth
         self.request_handler = request_handler
