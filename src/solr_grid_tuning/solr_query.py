@@ -43,7 +43,8 @@ class SolrQuery:
         url_params = []
 
         url_params.append(("q", self.q))
-        url_params.extend([("fq", filter_query) for filter_query in self.fq])
+        if self.fq is not None:
+            url_params.extend([("fq", filter_query) for filter_query in self.fq])
 
         if self.sort is not None:
             url_params.append(("sort", self.sort))
