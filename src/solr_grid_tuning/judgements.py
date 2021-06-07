@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Dict
 import pandas as pd
 
@@ -11,8 +12,15 @@ class Judgements:
 
     def __init__(self, judgements_file: str):
         self.judgements_file = judgements_file
-        self.judgements = read_judgements_file(judgements_file)
-        self.judgement_groups = self.judgements.groupby('query').groups
+        self.judgements: pd.DataFrame = read_judgements_file(judgements_file)
+        self.judgement_groups: pd.DataFrameGroupBy = self.judgements.groupby('query')
 
-    def get_judgements_for_query(self, query: str) -> pd.ndarray:
-        return self.judgement_groups['query']
+    @lru_cache(maxsize=100)
+    def get_judgements_for_query(self, query: str) -> Dict[str, float]:
+        return self.judgement_groups.get_group(query)\
+            .drop(columns='query').set_index('docid')\
+            .to_dict().get('rating')
+
+    @lru_cache(maxsize=1_000)
+    def get_judgement(self, query: str, doc: str) -> float:
+        return self.get_judgements_for_query(query).get(doc)
