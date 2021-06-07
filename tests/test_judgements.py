@@ -1,5 +1,6 @@
 import os
 from solr_grid_tuning.judgements import Judgements
+from solr_grid_tuning.metrics_calculation import ndcg
 
 
 JUDGE_CSV = '../example/Judgement_Catalog_basic.csv'
@@ -19,6 +20,9 @@ def test_init():
 
     rating = judgements.get_judgement(query=QUERY, doc=DOC_ID)
     assert(rating == 2.0)
+
+    score = ndcg(jfc, list(jfc.keys()))
+    assert(score > 0.1)
 
 
 if __name__ == '__main__':
