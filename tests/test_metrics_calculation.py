@@ -18,11 +18,20 @@ def test_non_optimal_list():
     assert round(ndcg(judgements, document_ids), 2) == 0.69
 
 
+def test_average_is_taken_for_unrated_documents():
+    judgements = {'a': 1, 'b': 0, 'c': 0, 'd': 1}
+    document_ids = ['e', 'b', 'a']
+    # DCG = 0.5/1 + 0/1.58496250072 + 1/2 = 1
+    # IDCG = 1/1 + 1/1.58496250072 + 0 + 0 = 1.63
+    assert round(ndcg(judgements, document_ids), 2) == 0.61
+
+
 def test_judgements_file():
     this_dir = os.path.dirname(__file__)
     example_file = os.path.join(this_dir, '../example/Judgement_Catalog_basic.csv')
     df = read_judgements_file(example_file)
-    assert(df.columns.array == ['query', 'docid', 'rating'])
+    assert (df.columns.array == ['query', 'docid', 'rating'])
+
 
 # calculate ndcg for 'tienda remolque'
 
