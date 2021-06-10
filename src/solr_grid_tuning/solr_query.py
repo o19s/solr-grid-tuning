@@ -55,6 +55,8 @@ class SolrQuery:
         if self.rows is not None:
             url_params.append(("rows", self.rows))
 
+        url_params.append(('json.wrf', 'tuning'))
+
         url_params.extend([(k, str(v)) for k, v in self.other_params if self.other_params is not None])
 
         return url_params

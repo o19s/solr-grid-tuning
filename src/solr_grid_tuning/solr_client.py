@@ -1,3 +1,4 @@
+import json
 import requests
 
 from typing import Tuple, Optional
@@ -18,7 +19,7 @@ class SolrClient:
         url = f"{self.base_url}/{self.collection}/{self.request_handler}"
         params_encoded = urlencode(q.to_url_params(), quote_via=quote)
         response = requests.get(url, auth=self.auth, params=params_encoded)
-        response_js = response.json()
+        response_js = json.loads(response.text.replace('tuning(', '').replace(')', ''))
 
         return {
             "statuscode": response.status_code,
