@@ -15,14 +15,14 @@ def test_init():
     judgements = Judgements(example_file)
     assert(judgements.judgement_groups.ngroups > 1)
 
-    jfc = judgements.get_judgements_for_query(query=QUERY)
-    assert(len(jfc) == 11)
+    jfq = judgements.get_judgements_for_query(query=QUERY)
+    assert(len(jfq) == 11)
 
     rating = judgements.get_judgement(query=QUERY, doc=DOC_ID)
     assert(rating == 2.0)
 
-    score = ndcg(jfc, list(jfc.keys()))
-    assert(score > 0.1)
+    score = ndcg(jfq, list(jfq.keys()))
+    assert(score == 1.0)
 
 
 if __name__ == '__main__':
