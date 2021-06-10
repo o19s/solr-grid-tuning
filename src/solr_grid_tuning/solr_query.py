@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 
 class SortOrder(str, Enum):
@@ -37,7 +37,7 @@ class SolrQuery:
     rows: int = 10
 
     # any other param
-    other_params: List[Tuple[str, str]] = None
+    other_params: List[Tuple[str, Any]] = None
 
     def to_url_params(self) -> List[Tuple[str, str]]:
         url_params = []
@@ -55,6 +55,6 @@ class SolrQuery:
         if self.rows is not None:
             url_params.append(("rows", self.rows))
 
-        url_params.extend(self.other_params)
+        url_params.extend([(k, str(v)) for k, v in self.other_params if self.other_params is not None])
 
         return url_params

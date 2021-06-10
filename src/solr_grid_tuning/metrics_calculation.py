@@ -1,13 +1,30 @@
-from typing import List, Dict, Tuple
+from typing import List, Dict, Optional, Tuple
 
 import math
 
+MIN_RATED_PCT = 50
 
-def ndcg(judgements: Dict[str, float], document_ids: List[str], at_n=10) -> float:
-    # todo: handle unrated documents, use a reasonable default, average?
-    documents_scored: List[Tuple[str, float]] = [(id, judgements.get(id, 0.5)) for id in document_ids]
+
+# Based on the given judgements score the ordered list of document IDs in document_ids
+def ndcg(judgements: Dict[str, float], document_ids: List[str], at_n=10) -> Optional[float]:
     judgements_sorted: List[Tuple[str, float]] = sorted(judgements.items(), key=lambda item: item[1], reverse=True)
-    return _ndcg(judgements_sorted, documents_scored)
+
+    # For each document on the list, get its judgment (which may be None if the document has not been judged so far)
+    scored_docs: List[Tuple[str, Optional[float]]] = [(d_id, judgements.get(d_id)) for d_id in document_ids][:at_n]
+    if len(scored_docs) == 0:
+        return None
+
+    # only calculate the ndcg for lists that have at least MIN_RATED_PCT percent of documents rated
+    documents_with_score = [d for d in scored_docs if d[1] is not None]
+    rated_pct = 100 * len(documents_with_score) / len(scored_docs)
+
+    if rated_pct >= MIN_RATED_PCT:
+        rating_average = sum([d[1] for d in documents_with_score]) / len(documents_with_score)
+        # fill the unrated documents with the average, this likely over-rates them but that's fine for now
+        scored_docs_adjusted = [d if d[1] is not None else (d[0], rating_average) for d in scored_docs]
+        return _ndcg(judgements_sorted, scored_docs_adjusted, at_n)
+    else:
+        return None
 
 
 def _ndcg(judged_items_sorted: List[Tuple[str, float]], list_sorted: List[Tuple[str, float]], at_n=10) -> float:

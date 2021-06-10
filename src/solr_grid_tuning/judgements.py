@@ -1,6 +1,31 @@
-from functools import lru_cache
-from typing import Dict
+import math
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
+
 import pandas as pd
+
+# document id -> judgement for that document
+JudgedDocuments = Dict[str, float]
+
+
+@dataclass
+class JudgedQuery:
+    query: str
+    judgements: JudgedDocuments
+
+    def __post_init__(self):
+        self.documents_in_ideal_order: List[Tuple[str, float]] = sorted(self.judgements.items(),
+                                                                        key=lambda item: item[1], reverse=True)
+
+    def get_judgement(self, doc_id: str) -> Optional[float]:
+        return self.judgements.get(doc_id)
+
+    def idcg(self, at_n: int = 10):
+        idcg = 0
+        for i in range(min(len(self.documents_in_ideal_order), at_n)):
+            denom = math.log(i + 2, 2)
+            idcg += self.documents_in_ideal_order[i][1] / denom
+        return idcg
 
 
 def read_judgements_file(filename: str) -> pd.DataFrame:
@@ -8,19 +33,24 @@ def read_judgements_file(filename: str) -> pd.DataFrame:
     return df
 
 
+def read_judgements_to_dict(filename: str) -> Dict[str, JudgedQuery]:
+    df = read_judgements_file(filename)
+    judgements: Dict[str, JudgedQuery] = {}
+    for row in df.itertuples():
+        judged_query = judgements.get(row.query, JudgedQuery(row.query, {}))
+        if not math.isnan(row.rating):
+            judged_query.judgements.update({row.docid: row.rating})
+            judgements.update({row.query: judged_query})
+    return judgements
+
+
 class Judgements:
 
     def __init__(self, judgements_file: str):
-        self.judgements_file = judgements_file
-        self.judgements: pd.DataFrame = read_judgements_file(judgements_file)
-        self.judgement_groups: pd.DataFrameGroupBy = self.judgements.groupby('query')
+        self.judged_queries: Dict[str, JudgedQuery] = read_judgements_to_dict(judgements_file)
 
-    @lru_cache(maxsize=100)
-    def get_judgements_for_query(self, query: str) -> Dict[str, float]:
-        return self.judgement_groups.get_group(query)\
-            .drop(columns='query').set_index('docid')\
-            .to_dict().get('rating')
+    def get_judgements_for_query(self, query: str) -> Optional[JudgedQuery]:
+        return self.judged_queries.get(query)
 
-    @lru_cache(maxsize=1_000)
-    def get_judgement(self, query: str, doc: str) -> float:
-        return self.get_judgements_for_query(query).get(doc)
+    def get_judgement(self, query: str, doc: str) -> Optional[float]:
+        return self.get_judgements_for_query(query).get_judgement(doc)

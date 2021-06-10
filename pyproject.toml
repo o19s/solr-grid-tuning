@@ -6,7 +6,8 @@ authors = []
 packages = [ {include = "solr_grid_tuning",  from = "src"} ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+pandas = "^1.2.4"
+python = "^3.7.1"
 requests = "^2.25.1"
 
 [tool.poetry.dev-dependencies]
