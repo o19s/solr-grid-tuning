@@ -1,8 +1,9 @@
 import math
+import pandas as pd
+
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
-import pandas as pd
 
 # document id -> judgement for that document
 JudgedDocuments = Dict[str, float]
@@ -41,6 +42,7 @@ def read_judgements_to_dict(filename: str) -> Dict[str, JudgedQuery]:
         if not math.isnan(row.rating):
             judged_query.judgements.update({row.docid: row.rating})
             judgements.update({row.query: judged_query})
+        judged_query.__post_init__()
     return judgements
 
 
